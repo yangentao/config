@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 buildscript {
     dependencies {
         classpath("org.jetbrains.dokka:dokka-base:2.0.0")
@@ -8,13 +10,15 @@ plugins {
     id("maven-publish")
     signing
     id("org.jetbrains.dokka") version "2.0.0"
+    id("com.vanniktech.maven.publish") version "0.31.0"
 }
 
 group = "io.github.yangentao"
-version = "1.0.2"
+version = "1.0.3"
+
 val artifactName = "config"
 val githubLib = "config"
-val libDesc = "config format, List, Map, String, null."
+val descLib = "config format, List, Map, String, null."
 
 
 repositories {
@@ -33,96 +37,46 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
-//    compilerOptions {
-//        jvmTarget = JvmTarget.JVM_21
-//    }
 }
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-//    withJavadocJar()
-//    withSourcesJar()
-//    artifact(dokkaJar)
 }
-//tasks.register<Jar>("dokkaJavadocJar") {
-//
-//    dependsOn(tasks["dokkaJavadoc"])
-//    from(tasks["dokkaJavadoc"].flatMap { it.outputDirectory })
-//    archiveClassifier.set("javadoc")
-//}
-//val javadocJar by tasks.registering(Jar::class) {
-//    archiveClassifier.set("javadoc")
-//    from(tasks["dokkaHtml"])
-//}
 
-//dokka{
-//    moduleName.set("Project Name")
-//    dokkaPublications.html {
-//        suppressInheritedMembers.set(true)
-//        failOnWarning.set(true)
-//    }
-//    dokkaSourceSets.main {
-//        includes.from("README.md")
-//        sourceLink {
-//            localDirectory.set(file("src/main/kotlin"))
-//            remoteUrl("https://example.com/src")
-//            remoteLineSuffix.set("#L")
-//        }
-//    }
-//    pluginsConfiguration.html {
-//        customStyleSheets.from("styles.css")
-//        customAssets.from("logo.png")
-//        footerMessage.set("(c) yangentao")
-//    }
-//}
-
-afterEvaluate {
-    val sourcesJar = task<Jar>("sourcesJar") {
-        from(sourceSets["main"].allSource)
-        archiveClassifier.set("sources")
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    coordinates(project.group.toString(), artifactName, project.version.toString())
+    pom {
+        configPom(this, artifactName, descLib, githubLib)
     }
+}
+//
+afterEvaluate {
+//    val sourcesJar = task<Jar>("sourcesJar") {
+//        from(sourceSets["main"].allSource)
+//        archiveClassifier.set("sources")
+//    }
 
     val dokkaJar = task<Jar>("dokkaJar") {
-        from(tasks["dokkaHtml"])
+        from(tasks.dokkaHtml)
         group = JavaBasePlugin.DOCUMENTATION_GROUP
         archiveClassifier.set("javadoc")
     }
     publishing {
         publications {
-            create<MavenPublication>("release") {
+            create<MavenPublication>("800") {
                 version = project.version.toString()
                 groupId = project.group.toString()
                 artifactId = artifactName
 
                 from(components["java"])
-                artifacts {
-                    artifact(sourcesJar)
-                    artifact(dokkaJar)
-                }
+                artifact(dokkaJar)
+//                artifact(tasks["sourcesJar"]) //mavenPublishing 已经包含了
 
                 pom {
-                    name = artifactName
-                    description = libDesc
-                    url = "https://github.com/yangentao/${githubLib}"
-                    licenses {
-                        license {
-                            name = "The Apache License, Version 2.0"
-                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = "yangentao"
-                            name = "YangEntao"
-                            email = "entaoyang@163.com"
-                        }
-                    }
-                    scm {
-                        connection = "scm:git@github.com:yangentao/${githubLib}.git"
-                        developerConnection = "scm:git@github.com:yangentao/${githubLib}.git"
-                        url = "https://github.com/yangentao/${githubLib}/tree/main"
-                    }
+                    configPom(this, artifactName, descLib, githubLib)
                 }
             }
         }
@@ -135,20 +89,40 @@ afterEvaluate {
                     password = providers.gradleProperty("ARCHIVA_PASSWORD").get()
                 }
             }
-            maven {
-                name = "Sonatype"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = providers.gradleProperty("MV_USER").get()
-                    password = providers.gradleProperty("MV_PWD").get()
-                }
-            }
         }
     }
     signing {
         sign(configurations.archives.get())
-        sign(publishing.publications["release"])
+//        sign(publishing.publications.mavenJava)
     }
 }
 
 
+
+fun configPom(pom: MavenPom, artifactName: String, descLib: String, githubLib: String = artifactName) {
+    pom.apply {
+        name.set(artifactName)
+        description.set(descLib)
+        inceptionYear.set("2025")
+        url.set("https://github.com/yangentao/$githubLib/")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("yangentao")
+                name.set("Yang Entao")
+                url.set("https://github.com/yangentao/")
+            }
+        }
+        scm {
+            url.set("https://github.com/yangentao/$githubLib/")
+            connection.set("scm:git:git://github.com/yangentao/$githubLib.git")
+            developerConnection.set("scm:git:ssh://git@github.com/yangentao/$githubLib.git")
+        }
+    }
+}
