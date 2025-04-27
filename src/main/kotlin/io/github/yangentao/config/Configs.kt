@@ -93,9 +93,9 @@ object Configs {
         }
     }
 
-    fun escape(value: String): String {
-        return escapeYConfigValue(value)
-    }
+//    fun escape(value: String): String {
+//        return escapeConfigValue(value)
+//    }
 }
 
 /**
@@ -269,11 +269,11 @@ object ConfigNull : ConfigValue() {
  */
 class ConfigString(val data: String) : ConfigValue(), Comparable<String> by data, CharSequence by data {
     override fun serializeTo(buf: StringBuilder) {
-        buf.append(escapeYConfigValue(data))
+        buf.append(escapeConfigValue(data))
     }
 
     override fun serializeTo(buf: StringBuilder, ident: Int) {
-        buf.append(escapeYConfigValue(data))
+        buf.append(escapeConfigValue(data))
     }
 
     override fun toString(): String {
@@ -725,7 +725,7 @@ private fun <T> List<T>.sublist(i: Int): List<T> {
     return this.subList(i, this.size)
 }
 
-private fun escapeYConfigValue(s: String): String {
+private fun escapeConfigValue(s: String): String {
     var n = 0
     for (c in s) {
         if (c in ESCAPE_CHARS) {
@@ -771,4 +771,4 @@ private val ASSIGNS: Set<Char> = hashSetOf(COLON, EQUAL)
 private val SEPS: Set<Char> = hashSetOf(CR, LF, SEM, COMMA)
 private val STR_END_KEY: Set<Char> = SEPS + BRACKETS + ASSIGNS
 private val STR_END_VALUE: Set<Char> = SEPS + BRACKETS
-private val ESCAPE_CHARS: Set<Char> = SEPS + BRACKETS + ASSIGNS + BACKSLASH
+private val ESCAPE_CHARS: Set<Char> = SEPS + BRACKETS + ASSIGNS + BACKSLASH + '#'

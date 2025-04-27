@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "io.github.yangentao"
-version = "1.0.3"
+version = "1.0.5"
 
 val artifactName = "config"
 val githubLib = "config"
