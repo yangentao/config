@@ -91,10 +91,10 @@ afterEvaluate {
             }
         }
     }
-    signing {
-        sign(configurations.archives.get())
+//    signing {
+//        sign(configurations.archives.get())
 //        sign(publishing.publications.mavenJava)
-    }
+//    }
 }
 
 
