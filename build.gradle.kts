@@ -66,7 +66,9 @@ afterEvaluate {
     }
     publishing {
         publications {
-            create<MavenPublication>("800") {
+          create<MavenPublication>("800") {
+
+
                 version = project.version.toString()
                 groupId = project.group.toString()
                 artifactId = artifactName
@@ -79,8 +81,10 @@ afterEvaluate {
                     configPom(this, artifactName, descLib, githubLib)
                 }
             }
+
         }
         repositories {
+            mavenLocal()
             maven {
                 name = "App800"
                 url = uri("https://app800.cn/maven/repository/public/")
@@ -91,10 +95,10 @@ afterEvaluate {
             }
         }
     }
-//    signing {
-//        sign(configurations.archives.get())
+    signing {
+        sign(configurations.archives.get())
 //        sign(publishing.publications.mavenJava)
-//    }
+    }
 }
 
 
