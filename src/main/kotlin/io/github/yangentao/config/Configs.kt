@@ -487,8 +487,21 @@ private class ConfigParser(private val text: String, private val allowKeyPath: B
     private val data: CharArray = text.toCharArray()
     private var current: Int = 0
 
-    private val end: Boolean get() = current >= data.size
-    private val currentChar: Char get() = data[current]
+    private val end: Boolean
+        get() {
+            if (current >= data.size) return true
+            if (data[current] == '#' && '\\' != preChar) {
+                while (current < data.size && !data[current].isCRLF) {
+                    ++current
+                }
+            }
+            return current >= data.size
+        }
+    private val preChar: Char? get() = data.getOrNull(current - 1)
+    private val currentChar: Char
+        get() {
+            return data[current]
+        }
 
     fun parse(): ConfigValue {
         skipSpTabCrLf()

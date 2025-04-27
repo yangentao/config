@@ -15,6 +15,21 @@ internal class YConfigTestsParse {
     }
 
     @Test
+    fun testComment() {
+        val s = """
+            #comment
+            {
+            # comment
+            a:123 # this is comment 
+            b=[1,2,3]
+            }
+            #comment
+        """.trimIndent()
+        val v = Configs.parse(s)
+        println(v)
+    }
+
+    @Test
     fun test2() {
         val value = Configs.parse(testText)
         println(value.getPath("aa"))
