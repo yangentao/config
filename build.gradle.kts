@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 buildscript {
     dependencies {
@@ -14,7 +15,7 @@ plugins {
 }
 
 group = "io.github.yangentao"
-version = "1.0.5"
+version = "1.0.6"
 
 val artifactName = "config"
 val githubLib = "config"
@@ -37,11 +38,14 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
 }
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 mavenPublishing {
@@ -66,8 +70,7 @@ afterEvaluate {
     }
     publishing {
         publications {
-          create<MavenPublication>("800") {
-
+            create<MavenPublication>("800") {
 
                 version = project.version.toString()
                 groupId = project.group.toString()
@@ -95,10 +98,10 @@ afterEvaluate {
             }
         }
     }
-    signing {
-        sign(configurations.archives.get())
+//    signing {
+//        sign(configurations.archives.get())
 //        sign(publishing.publications.mavenJava)
-    }
+//    }
 }
 
 
