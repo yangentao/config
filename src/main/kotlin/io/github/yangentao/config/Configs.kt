@@ -2,8 +2,10 @@
 
 package  io.github.yangentao.config
 
+import io.github.yangentao.anno.userName
 import java.io.File
 import java.util.stream.IntStream
+import kotlin.reflect.KProperty
 
 //operator fun ConfigMap.getValue(thisRef: ConfigMap, property: KProperty<*>): String? {
 //    return thisRef.getPath(property.userName)?.asString
@@ -112,6 +114,8 @@ abstract class ConfigValue {
     val asMap: ConfigMap? get() = this as? ConfigMap
     val asString: String? get() = (this as? ConfigString)?.data
     val asInt: Int? get() = asString?.trim()?.toIntOrNull()
+    val asLong: Long? get() = asString?.trim()?.toLongOrNull()
+    val asFloat: Float? get() = asString?.trim()?.toFloatOrNull()
     val asDouble: Double? get() = asString?.trim()?.toDoubleOrNull()
     val asBoolean: Boolean? get() = asString?.trim()?.toBooleanValue()
 
@@ -318,6 +322,12 @@ class ConfigString(val data: String) : ConfigValue(), Comparable<String> by data
 @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
 class ConfigList(val data: ArrayList<ConfigValue> = ArrayList()) : ConfigValue(), MutableList<ConfigValue> by data {
 
+    val intList: List<Int> get() = data.mapNotNull { it.asInt }
+    val longList: List<Long> get() = data.mapNotNull { it.asLong }
+    val floatList: List<Float> get() = data.mapNotNull { it.asFloat }
+    val doubleList: List<Double> get() = data.mapNotNull { it.asDouble }
+    val boolList: List<Boolean> get() = data.mapNotNull { it.asBoolean }
+
     fun removeNulls(): ConfigList {
         data.removeIf { it.isNull }
         return this
@@ -393,11 +403,38 @@ class ConfigList(val data: ArrayList<ConfigValue> = ArrayList()) : ConfigValue()
  * ```
  */
 class ConfigMap(val data: LinkedHashMap<String, ConfigValue> = LinkedHashMap()) : ConfigValue(), MutableMap<String, ConfigValue> by data {
+    fun getBool(key: String): Boolean? = get(key)?.asBoolean
     fun getInt(key: String): Int? = get(key)?.asInt
+    fun getLong(key: String): Long? = get(key)?.asLong
+    fun getFloat(key: String): Float? = get(key)?.asFloat
     fun getDouble(key: String): Double? = get(key)?.asDouble
     fun getString(key: String): String? = get(key)?.asString
     fun getList(key: String): ConfigList? = get(key)?.asList
     fun getMap(key: String): ConfigMap? = get(key)?.asMap
+
+    // TODO List, Set, Map
+    inline operator fun <reified T : Any> getValue(thisRef: ConfigMap, property: KProperty<*>): T? {
+        val cls = T::class
+        val key = property.userName
+        return when (cls) {
+            String::class -> getString(key) as? T
+            Int::class -> getInt(key) as? T
+            Long::class -> getLong(key) as? T
+            Float::class -> getFloat(key) as? T
+            Double::class -> getDouble(key) as? T
+            Boolean::class -> getBool(key) as? T
+            else -> null
+        }
+    }
+
+    // TODO List, Set, Map
+    operator fun setValue(thisRef: ConfigMap, property: KProperty<*>, value: Any?) {
+        val key = property.userName
+        when (value) {
+            null -> remove(key)
+            else -> putAny(key, value)
+        }
+    }
 
     fun removeNulls(): ConfigMap {
         val ks = HashSet<String>()
@@ -437,6 +474,7 @@ class ConfigMap(val data: LinkedHashMap<String, ConfigValue> = LinkedHashMap()) 
         buf.append('}')
     }
 
+    // TODO List, Set, Map
     fun putAny(key: String, value: Any) {
         when (value) {
             is Number -> set(key, value)

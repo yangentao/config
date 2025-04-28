@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.github.yangentao"
-version = "1.0.6"
+version = "1.0.7"
 
 val artifactName = "config"
 val githubLib = "config"
@@ -29,8 +29,9 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-//    implementation(kotlin("reflect"))
+    implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
+    implementation("io.github.yangentao:anno:[1.0.1,)")
 }
 
 tasks.test {
@@ -58,34 +59,7 @@ mavenPublishing {
 }
 //
 afterEvaluate {
-//    val sourcesJar = task<Jar>("sourcesJar") {
-//        from(sourceSets["main"].allSource)
-//        archiveClassifier.set("sources")
-//    }
-
-    val dokkaJar = task<Jar>("dokkaJar") {
-        from(tasks.dokkaHtml)
-        group = JavaBasePlugin.DOCUMENTATION_GROUP
-        archiveClassifier.set("javadoc")
-    }
     publishing {
-        publications {
-            create<MavenPublication>("800") {
-
-                version = project.version.toString()
-                groupId = project.group.toString()
-                artifactId = artifactName
-
-                from(components["java"])
-                artifact(dokkaJar)
-//                artifact(tasks["sourcesJar"]) //mavenPublishing 已经包含了
-
-                pom {
-                    configPom(this, artifactName, descLib, githubLib)
-                }
-            }
-
-        }
         repositories {
             mavenLocal()
             maven {
@@ -98,13 +72,7 @@ afterEvaluate {
             }
         }
     }
-//    signing {
-//        sign(configurations.archives.get())
-//        sign(publishing.publications.mavenJava)
-//    }
 }
-
-
 
 fun configPom(pom: MavenPom, artifactName: String, descLib: String, githubLib: String = artifactName) {
     pom.apply {
