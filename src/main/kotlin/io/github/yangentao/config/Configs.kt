@@ -7,17 +7,6 @@ import java.io.File
 import java.util.stream.IntStream
 import kotlin.reflect.KProperty
 
-//operator fun ConfigMap.getValue(thisRef: ConfigMap, property: KProperty<*>): String? {
-//    return thisRef.getPath(property.userName)?.asString
-//}
-//
-//operator fun ConfigMap.setValue(thisRef: ConfigMap, property: KProperty<*>, value: String?) {
-//    if (value == null) {
-//        thisRef.setPath(property.userName, YConfigNull)
-//    } else {
-//        thisRef.setPath(property.userName, YConfigString(value))
-//    }
-//}
 /**
  * Parse map or list. single value is string or null
  * ```
@@ -29,43 +18,6 @@ import kotlin.reflect.KProperty
  * ```
  */
 object Configs {
-//    private val KClass<*>.configableProperties: List<KMutableProperty<*>>
-//        get() = this.declaredMemberPropertiesSorted.filter {
-//            it is KMutableProperty<*> && it.isPublic && !it.isLateinit && !it.excluded
-//        }.cast()
-
-    //只支持数字和字符串
-//    fun <T : Any> toModel(map: YConfigMap, cls: KClass<T>): T {
-//        val inst: T = cls.createInstance()
-//        val ps: List<KMutableProperty<*>> = cls.configableProperties
-//        for (p in ps) {
-//            val yv: YConfigValue? = map[p.userName]
-//            when (yv) {
-//                null, is YConfigNull -> {}
-//
-//                is YConfigString -> {
-//                    val v = yv.toPropertyValue(p)
-//                    if (v != null) {
-//                        p.setPropValue(inst, v)
-//                    }
-//                }
-//
-//                else -> error("Unsupport property: $p,  value: $yv")
-//            }
-//
-//        }
-//        return inst
-//    }
-
-    //只支持数字和字符串
-//    fun <T : Any> fromModel(model: T): YConfigMap {
-//        val ps: List<KMutableProperty<*>> = model::class.configableProperties
-//        val map = YConfigMap()
-//        for (p in ps) {
-//            map.putAny(p.userName, p.getPropValue(model) ?: "")
-//        }
-//        return map
-//    }
 
     fun serialize(map: ConfigMap, pretty: Boolean = true): String {
         return map.serialize(pretty)
@@ -95,9 +47,6 @@ object Configs {
         }
     }
 
-//    fun escape(value: String): String {
-//        return escapeConfigValue(value)
-//    }
 }
 
 /**
@@ -140,26 +89,6 @@ abstract class ConfigValue {
     abstract fun serializeTo(buf: StringBuilder)
     abstract fun serializeTo(buf: StringBuilder, ident: Int)
 
-    // int, string, double ...
-//    inline fun <reified T> readTo(p: KMutableProperty0<T>, miss: T? = null) {
-//        val v = getPath(p)
-//        val setter = p.setter
-//        setter.isAccessible = true
-//        if (v != null) {
-//            setter.call(p.decodeValue(v.asString))
-//        } else if (miss != null) {
-//            setter.call(miss)
-//        } else if (p.returnType.isMarkedNullable) {
-//            setter.call(null)
-//        } else {
-//            error("${p.name} is null")
-//        }
-//    }
-
-//    fun getPath(p: KProperty<*>): YConfigValue? {
-//        return getPath(p.userName)
-//    }
-
     fun getPath(paths: String): ConfigValue? {
         return getPath(paths.split(DOT).map { it.trim() })
     }
@@ -170,10 +99,6 @@ abstract class ConfigValue {
         if (paths.size == 1) return v
         return v.getPath(paths.sublist(1))
     }
-
-//    fun setPath(key: KProperty<*>, value: Any?) {
-//        this.setPath(key.userName, value)
-//    }
 
     fun setPath(paths: String, value: Any?): Boolean {
         return setPath(paths.split(DOT).map { it.trim() }, value)
@@ -233,14 +158,6 @@ object ConfigNull : ConfigValue() {
         return "null"
     }
 
-//    override fun toPropertyValue(p: KProperty<*>): Any? {
-//        val s = p.findAnnotation<NullValue>()?.value
-//        if (s != null) {
-//            return p.decodeValue(s)
-//        }
-//        return null
-//    }
-
     override fun serializeTo(buf: StringBuilder) {
         // do nothing
     }
@@ -283,10 +200,6 @@ class ConfigString(val data: String) : ConfigValue(), Comparable<String> by data
     override fun toString(): String {
         return data
     }
-
-//    override fun toPropertyValue(p: KProperty<*>): Any? {
-//        return p.decodeValue(data)
-//    }
 
     override fun getByKey(key: String, autoCreate: Boolean): ConfigValue? {
         return null

@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.github.yangentao"
-version = "1.1.0"
+version = "1.1.1"
 
 val artifactName = "config"
 val githubLib = "config"
@@ -23,6 +23,7 @@ val descLib = "config format, List, Map, String, null."
 
 
 repositories {
+    mavenLocal()
     mavenCentral()
 //    maven("https://app800.cn/maven/repository/public/")
 }
@@ -32,6 +33,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
     implementation("io.github.yangentao:anno:[1.1.0,)")
+    implementation("io.github.yangentao:charcode:[1.0.0,)")
 }
 
 tasks.test {
