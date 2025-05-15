@@ -33,7 +33,6 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
     implementation("io.github.yangentao:anno:[1.1.0,)")
-    implementation("io.github.yangentao:charcode:[1.0.0,)")
 }
 
 tasks.test {
