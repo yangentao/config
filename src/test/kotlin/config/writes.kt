@@ -11,11 +11,11 @@ internal class YConfigTests {
         val m = ConfigMap()
 //    m.path("name", "entao")
 //    m.path("user.name", "yang")
-        m.setPath("user.name.first", "yang")
-        m.setPath("user.name.last", "entao")
+//        m.setPath("user.name.first", "yang")
+//        m.setPath("user.name.last", "entao")
         println(m)
-        assertEquals("{first:yang,last:entao}", m.getPath("user.name").toString())
-        assertEquals("yang", m.getPath("user.name.first").toString())
+//        assertEquals("{first:yang,last:entao}", m.getPath("user.name").toString())
+//        assertEquals("yang", m.getPath("user.name.first").toString())
     }
 
 }

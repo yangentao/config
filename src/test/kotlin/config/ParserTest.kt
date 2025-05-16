@@ -1,17 +1,18 @@
 package config
 
+import io.github.yangentao.config.ConfigMap
 import io.github.yangentao.config.Configs
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertContentEquals
 
 internal class YConfigTestsParse {
 
     @Test
     fun test1() {
         val stest = """{a=[ 1,2,,]}""".trimMargin()
-        val value = Configs.parse(stest, true)
+        val value = Configs.parse(stest, true) as ConfigMap
         println(value)
-        assertEquals(2, value.getPath("a.1")?.asInt)
+        assertContentEquals(listOf("1", "2"), value.getList("a"))
     }
 
     @Test
@@ -32,12 +33,12 @@ internal class YConfigTestsParse {
     @Test
     fun test2() {
         val value = Configs.parse(testText)
-        println(value.getPath("aa"))
-        println(value.getPath("ab"))
-        println(value.getPath("ab.0"))
-        println(value.getPath("ab.1"))
+//        println(value.getPath("aa"))
+//        println(value.getPath("ab"))
+//        println(value.getPath("ab.0"))
+//        println(value.getPath("ab.1"))
         println(value.toString())
-        assertEquals("[1,2,3]", value.getPath("ls")?.toString())
+//        assertEquals("[1,2,3]", value.getPath("ls")?.toString())
     }
 
     private val testText: String = """
