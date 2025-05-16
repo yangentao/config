@@ -7,6 +7,18 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 internal class YConfigTestsParse {
+    @Test
+    fun test3() {
+        val stest = """
+            a=[1,2]
+            b=OK
+            c=123
+            
+            """.trimMargin()
+        val value = Configs.parse(stest) as ConfigMap
+        println(value)
+        assertContentEquals(listOf("1", "2"), value.getList("a"))
+    }
 
     @Test
     fun test1() {

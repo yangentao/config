@@ -15,11 +15,11 @@ plugins {
 }
 
 group = "io.github.yangentao"
-version = "1.1.3"
+version = "1.1.5"
 
 val artifactName = "config"
 val githubLib = "config"
-val descLib = "config format, List, Map, String, null."
+val descLib = "config format, List, Map, String."
 
 
 repositories {

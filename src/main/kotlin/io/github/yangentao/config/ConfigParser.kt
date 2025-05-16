@@ -21,7 +21,7 @@ internal class ConfigParser(json: String) {
         val value = when (ch) {
             CharCode.LCUB -> parseObject()
             CharCode.LSQB -> parseArray()
-            else -> raise()
+            else -> parseObject(needCube = false)
         }
         skipWhites()
         if (!ts.isEnd) raise()
@@ -52,11 +52,11 @@ internal class ConfigParser(json: String) {
         }
     }
 
-    private fun parseObject(): ConfigMap {
+    private fun parseObject(needCube: Boolean = true): ConfigMap {
         skipWhites()
         val map = ConfigMap()
-        ts.expectChar(CharCode.LCUB)
-        while (ts.nowChar != CharCode.RCUB) {
+        if (needCube) ts.expectChar(CharCode.LCUB)
+        while (!ts.isEnd && ts.nowChar != CharCode.RCUB) {
             skipWhites()
             val key = parseKey()
             skipWhites()
@@ -64,11 +64,11 @@ internal class ConfigParser(json: String) {
             val v = parseValue()
             map.put(key, v)
             val trails = ts.skipChars(TRAIL)
-            if (ts.nowChar != CharCode.RCUB) {
+            if (!ts.isEnd && ts.nowChar != CharCode.RCUB) {
                 if (trails.intersect(SEP).isEmpty()) raise()
             }
         }
-        ts.expectChar(CharCode.RCUB)
+        if (needCube) ts.expectChar(CharCode.RCUB)
         return map
     }
 
