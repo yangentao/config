@@ -95,7 +95,7 @@ object Configs {
         }
     }
 
-    fun tryParse(text: String, allowKeyPath: Boolean = true): Any? {
+    fun tryParse(text: String): Any? {
         try {
             return ConfigParser(text).parse()
         } catch (ex: Exception) {
@@ -103,11 +103,11 @@ object Configs {
         }
     }
 
-    fun parse(text: String, allowKeyPath: Boolean = true): Any? {
+    fun parse(text: String): Any? {
         return ConfigParser(text).parse()
     }
 
-    fun parseFile(file: File, allowKeyPath: Boolean = true): Any? {
+    fun parseFile(file: File): Any? {
         try {
             val text = file.readText()
             return ConfigParser(text).parse()

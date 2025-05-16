@@ -4,13 +4,14 @@ import io.github.yangentao.config.ConfigMap
 import io.github.yangentao.config.Configs
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 internal class YConfigTestsParse {
 
     @Test
     fun test1() {
         val stest = """{a=[ 1,2,,]}""".trimMargin()
-        val value = Configs.parse(stest, true) as ConfigMap
+        val value = Configs.parse(stest) as ConfigMap
         println(value)
         assertContentEquals(listOf("1", "2"), value.getList("a"))
     }
@@ -21,13 +22,16 @@ internal class YConfigTestsParse {
             #comment
             {
             # comment
-            a:123 # this is comment 
+            a:123 
             b=[1,2,3]
             }
             #comment
+            
         """.trimIndent()
-        val v = Configs.parse(s)
+        val v = Configs.parse(s) as ConfigMap
         println(v)
+        assertEquals("123", v["a"])
+        assertContentEquals(listOf("1", "2", "3"), v.getList("b"))
     }
 
     @Test

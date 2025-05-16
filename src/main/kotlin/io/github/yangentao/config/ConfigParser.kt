@@ -6,8 +6,16 @@ import io.github.yangentao.charcode.TextScanner
 internal class ConfigParser(json: String) {
     val ts = TextScanner(json)
 
+    fun skipWhites() {
+        while (!ts.isEnd) {
+            var n = ts.skipWhites().size
+            if (!ts.isEnd && ts.nowChar == CharCode.SHARP) n += skipComment()
+            if (n == 0) break
+        }
+    }
+
     fun parse(): Any? {
-        ts.skipWhites()
+        skipWhites()
         if (ts.isEnd) return null
         val ch = ts.nowChar
         val value = when (ch) {
@@ -15,13 +23,26 @@ internal class ConfigParser(json: String) {
             CharCode.LSQB -> parseArray()
             else -> raise()
         }
-        ts.skipWhites()
+        skipWhites()
         if (!ts.isEnd) raise()
         return value
     }
 
+    private fun skipComment(): Int {
+        var n = 0
+        while (!ts.isEnd && ts.nowChar != CharCode.CR && ts.nowChar != CharCode.LF) {
+            n += 1
+            ts.skip(size = 1)
+        }
+        while (!ts.isEnd && (ts.nowChar == CharCode.CR || ts.nowChar == CharCode.LF)) {
+            n += 1
+            ts.skip(size = 1)
+        }
+        return n
+    }
+
     private fun parseValue(): Any {
-        ts.skipWhites()
+        skipWhites()
         if (ts.isEnd) raise()
         val ch = ts.nowChar
         return when (ch) {
@@ -32,13 +53,13 @@ internal class ConfigParser(json: String) {
     }
 
     private fun parseObject(): ConfigMap {
-        ts.skipWhites()
+        skipWhites()
         val map = ConfigMap()
         ts.expectChar(CharCode.LCUB)
         while (ts.nowChar != CharCode.RCUB) {
-            ts.skipWhites()
+            skipWhites()
             val key = parseKey()
-            ts.skipWhites()
+            skipWhites()
             ts.expectAnyChar(ASSIGN)
             val v = parseValue()
             map.put(key, v)
@@ -52,12 +73,12 @@ internal class ConfigParser(json: String) {
     }
 
     private fun parseArray(): ConfigList {
-        ts.skipWhites()
+        skipWhites()
         val list = ConfigList()
         ts.expectChar(CharCode.LSQB)
-        ts.skipWhites()
+        skipWhites()
         while (ts.nowChar != CharCode.RSQB) {
-            ts.skipWhites()
+            skipWhites()
             val v = parseValue()
             list.add(v)
             val trails = ts.skipChars(TRAIL)
@@ -76,7 +97,7 @@ internal class ConfigParser(json: String) {
     }
 
     private fun parseString(): String {
-        val charList = ts.moveNext(terminator = { it in SEP && ts.preChar != CharCode.BSLASH })
+        val charList = ts.moveNext(terminator = { (it in SEP || it == CharCode.SHARP || it == CharCode.RCUB || it == CharCode.RSQB) && ts.preChar != CharCode.BSLASH })
         val s = codesToString(charList)
         return s.trim()
     }

@@ -16,7 +16,7 @@ import kotlin.reflect.KProperty
  * }
  * ```
  */
-class ConfigMap(val data: LinkedHashMap<String, Any> = LinkedHashMap()) : MutableMap<String, Any> by data {
+class ConfigMap(val data: LinkedHashMap<String, Any> = LinkedHashMap()) : Map<String, Any> by data {
     fun getString(key: String): String? = get(key) as? String
     fun getBool(key: String): Boolean? = getString(key)?.toBooleanValue()
     fun getInt(key: String): Int? = getString(key)?.toInt()
@@ -56,17 +56,14 @@ class ConfigMap(val data: LinkedHashMap<String, Any> = LinkedHashMap()) : Mutabl
         this[key] = value
     }
 
-    // TODO List<Int> ... Array<?>...
     operator fun set(key: String, value: Any?) {
         if (value == null) {
             data.remove(key)
-            return
-        }
-        when (value) {
-            is ConfigList -> data[key] = value
-            is ConfigMap -> data[key] = value
-            else -> data[key] = value.toString()
+        } else {
+            data[key] = anyToConfigValue(value)
         }
     }
+
+    fun remove(key: String): Any? = data.remove(key)
 
 }

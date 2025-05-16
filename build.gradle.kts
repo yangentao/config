@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.github.yangentao"
-version = "1.1.2"
+version = "1.1.3"
 
 val artifactName = "config"
 val githubLib = "config"
@@ -33,7 +33,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
     implementation("io.github.yangentao:anno:[1.1.0,)")
-    implementation("io.github.yangentao:charcode:[1.0.0,)")
+    implementation("io.github.yangentao:charcode:[1.0.2,)")
 }
 
 tasks.test {
